@@ -25,7 +25,6 @@ class TestNotes(TestMixinCreatNoteConstant, TestMixinNote):
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_redirect_for_anonymous_user(self):
-        """Проверка редиректа анонимного пользователя."""
         login_url = reverse('users:login')
         for name in ('notes:detail', 'notes:edit', 'notes:delete'):
             with self.subTest(name=name):
@@ -35,7 +34,6 @@ class TestNotes(TestMixinCreatNoteConstant, TestMixinNote):
                 self.assertRedirects(response, redirect_url)
 
     def test_author_note_(self):
-        """Проверка доступности страниц."""
         url = (
             ('notes:list', None),
             ('notes:success', None),

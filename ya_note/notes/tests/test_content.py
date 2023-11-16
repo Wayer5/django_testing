@@ -9,10 +9,6 @@ User = get_user_model()
 class TestContextNote(TestMixinCreatNoteConstant, TestMixinAuthorNoteReader):
 
     def test_context_note(self):
-        """
-        Отдельная заметка передаётся на страницу со списком заметок
-        в списке object_list в словаре context.
-        """
         url = reverse('notes:list')
         response = self.author_client.get(url)
         object_list = response.context['object_list']
@@ -20,10 +16,6 @@ class TestContextNote(TestMixinCreatNoteConstant, TestMixinAuthorNoteReader):
         self.assertTrue((self.note in object_list), True)
 
     def test_list_notes_user_dsnt_appear_notes_another(self):
-        """
-        В список заметок одного пользователя
-        не попадают заметки другого пользователя.
-        """
         users = (
             (self.author_client, True),
             (self.reader_client, False),
@@ -36,7 +28,6 @@ class TestContextNote(TestMixinCreatNoteConstant, TestMixinAuthorNoteReader):
                     (self.note in object_list) is value)
 
     def test_user_has_form(self):
-        """На странице создания и редактирования заметки передаются формы."""
         for url, kwargs in (('notes:add', None),
                             ('notes:edit', {'slug': self.note.slug})):
             with self.subTest(url=url):
