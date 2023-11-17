@@ -1,7 +1,8 @@
 import pytest
+
 from django.urls import reverse
-from news.models import Comment
-from news.models import News
+
+from news.models import Comment, News
 
 
 @pytest.fixture

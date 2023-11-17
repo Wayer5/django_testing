@@ -1,8 +1,10 @@
-from http import HTTPStatus
 import pytest
+
+from http import HTTPStatus
 from django.urls import reverse
-from news.models import News
 from pytest_django.asserts import assertRedirects
+
+from news.models import News
 
 
 @pytest.mark.django_db
