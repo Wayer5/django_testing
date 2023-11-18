@@ -10,24 +10,26 @@ from news.forms import BAD_WORDS
 
 @pytest.mark.django_db
 def test_anonymous_user_cant_create_comment(client, form_data, news):
-    assert Comment.objects.count() == 0
+    comms_exp = Comment.objects.count()
     url = reverse('news:detail', args=(news.pk,))
     response = client.post(url, data=form_data)
     login_url = reverse('users:login')
     expected_url = f'{login_url}?next={url}'
     assertRedirects(response, expected_url)
-    assert Comment.objects.count() == 0
+    comms_count = Comment.objects.count()
+    assert comms_exp == comms_count
 
 
 @pytest.mark.django_db
 def test_comment_contains_forbidden_words(author_client, news):
-    assert Comment.objects.count() == 0
+    comms_exp = Comment.objects.count()
     for bad_word in BAD_WORDS:
         form_data = {'text': {bad_word}}
     url = reverse('news:detail', args=(news.pk,))
     response_anonymous = author_client.post(url, data=form_data)
     assert response_anonymous.status_code == HTTPStatus.OK
-    assert Comment.objects.count() == 0
+    comms_count = Comment.objects.count()
+    assert comms_exp == comms_count
 
 
 @pytest.mark.django_db
@@ -50,26 +52,28 @@ def test_other_user_cant_edit_comment(
 
 
 def test_author_can_delete_comment(author_client, delete_url, url_to_comments):
-    assert Comment.objects.count() == 1
+    comms_exp = Comment.objects.count() - 1
     response = author_client.post(delete_url)
     assertRedirects(response, url_to_comments)
-    assert Comment.objects.count() == 0
+    comms_count = Comment.objects.count()
+    assert comms_exp == comms_count
 
 
 def test_other_user_cant_delete_comment(admin_client, delete_url):
-    assert Comment.objects.count() == 1
+    comms_exp = Comment.objects.count()
     response = admin_client.post(delete_url)
     assert response.status_code == HTTPStatus.NOT_FOUND
-    assert Comment.objects.count() == 1
+    comms_count = Comment.objects.count()
+    assert comms_exp == comms_count
 
 
 def test_user_can_create_comment(author_client, detail_url, form_data, news,
                                  author, url_to_comments):
-    assert Comment.objects.count() == 0
+    comms_exp = Comment.objects.count() + 1
     response = author_client.post(detail_url, data=form_data)
     assertRedirects(response, url_to_comments)
-    comments_count = Comment.objects.count()
-    assert comments_count == 1
+    comms_count = Comment.objects.count()
+    assert comms_exp == comms_count
     comment = Comment.objects.get()
     assert comment.text == form_data['text']
     assert comment.news == news

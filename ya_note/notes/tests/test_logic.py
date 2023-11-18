@@ -22,10 +22,10 @@ class TestNoteCreation(TestMixinCreatNoteConstant, TestMixinNoteCreate):
         self.assertEqual(notes.slug, self.NOTE_SLUG)
 
     def test_anonymous_cant_create_note(self):
-        note_count = Note.objects.count()
-        self.assertEqual(note_count, 0)
+        note_exp = Note.objects.count()
         self.client.post(self.url, data=self.form_data)
-        self.assertEqual(note_count, 0)
+        note_count = Note.objects.count()
+        self.assertEqual(note_exp, note_count)
 
     def test_unique_slug_field(self):
         Note.objects.create(
@@ -56,20 +56,18 @@ class TestNoteEditDelete(TestMixinCreatNoteConstant,
                          TestMixinNoteEditDelete):
 
     def test_author_can_delete_note(self):
-        note_count = Note.objects.count()
-        self.assertEqual(note_count, 1)
+        note_exp = Note.objects.count() - 1
         response = self.author_client.delete(self.url_delete)
         self.assertRedirects(response, self.success_url)
         note_count = Note.objects.count()
-        self.assertEqual(note_count, 0)
+        self.assertEqual(note_count, note_exp)
 
     def test_user_cant_delete_note_of_another_user(self):
-        note_count = Note.objects.count()
-        self.assertEqual(note_count, 1)
+        note_exp = Note.objects.count()
         response = self.reader_client.delete(self.url_delete)
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
         note_count = Note.objects.count()
-        self.assertEqual(note_count, 1)
+        self.assertEqual(note_count, note_exp)
 
     def test_author_can_edit_note(self):
         response = self.author_client.post(self.url_edit, data=self.form_data)
