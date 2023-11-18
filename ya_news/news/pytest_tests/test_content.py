@@ -36,8 +36,8 @@ def test_home_page_order(client, create_news):
 def test_news_detail_comments_order(
     client, create_comment, author, detail_url
 ):
-    create_comment(text='текст', author=author, news_id=1, id=2)
     create_comment(text='текст', author=author, news_id=1, id=1)
+    create_comment(text='текст', author=author, news_id=1, id=2)
     response = client.get(detail_url)
     assert response.status_code == HTTPStatus.OK
     comments = response.context.get('object').comment_set.all()
